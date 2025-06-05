@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 public static class GameData
 {
@@ -32,24 +34,37 @@ public static class GameData
     public static Dictionary<int, List<string>> notebook;
     public static int notesCounter;
 
-    public static void ClearNotebook()
+    public static void InitializeNotebook()
     {
-        notebook.Clear();
-        notesCounter = 0;
-    }
+        if (notebook == null)
+            notebook = new Dictionary<int, List<string>>();
+        else if (notebook.Count > 0)
+            notebook.Clear();
 
-    public static void AddNote(string name, string date, string events, string place)
+        notesCounter = 0;
+    }   
+
+    public static void AddNote(string name, string place, string events, string date)
     {
         List<string> note = new List<string>();
 
         note.Add(name);
-        note.Add(date);
-        note.Add(events);
         note.Add(place);
+        note.Add(events);
+        note.Add(date);
 
         notebook.Add(notesCounter, note);
-        notesCounter++;
+        notesCounter++;        
     }
 
+    #endregion
+
+    #region MapButtons
+    public static List<int> mapButtons;
+
+    public static void AddButtonToInactive(int buttonIndex)
+    {
+        mapButtons.Add(buttonIndex);
+    }
     #endregion
 }
