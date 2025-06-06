@@ -1,26 +1,42 @@
-using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class SceneManagement : MonoBehaviour
 {
-    public static Action OnTimerStart;
+    [SerializeField] private AudioSource _audioSource;
 
-    public void OnSceneIndexLoad(string sceneName)
+    private void OnEnable()
+    {
+        PanelFader.OnFadeEnd += OnSceneNameLoad;
+    }
+
+    private void OnDisable()
+    {
+        PanelFader.OnFadeEnd -= OnSceneNameLoad;
+    }
+
+    public void OnSceneNameLoad(string sceneName)
     {
         if (SceneManager.GetActiveScene().name == "MainMenu")
         {
             GameData.SetStartDay();
             GameData.InitializeNotebook();
         }
-        else if (SceneManager.GetActiveScene().name == "HouseScene")
-            OnTimerStart?.Invoke();
 
-        SceneManager.LoadScene(sceneName);
+        StartCoroutine(WaitForSound(sceneName));         
     }
 
     public void OnGameQuit()
     {
         Application.Quit();
+    }
+
+    private IEnumerator WaitForSound(string sceneName)
+    {
+        while (_audioSource.isPlaying)
+            yield return null;
+
+        SceneManager.LoadScene(sceneName);
     }
 }

@@ -1,44 +1,46 @@
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class VisitTimer : MonoBehaviour
 {
-    [SerializeField] private Text _timerText;
-    
-    private SceneManagement _sceneManagement;
+    public static Action<string> OnTimeGone; 
+
+    [SerializeField] private Text _timerText;   
 
     private bool _timerRunning = false;
-    private float _maxTime = 61;
+    private float _maxTime = 300f;
     private float _currentTime;
 
     private void OnEnable()
     {
-        SceneManagement.OnTimerStart += Timer;
+        PanelFader.OnHouseScene += Timer;
     }
 
     private void OnDisable()
     {
-        SceneManagement.OnTimerStart -= Timer;
+        PanelFader.OnHouseScene -= Timer;
     }
 
     private void Start()
-    {
-        _sceneManagement = GetComponent<SceneManagement>();
-
+    {        
         _currentTime = _maxTime;
-        _timerText.text = $"{(_currentTime / 60).ToString("00")}:{(_currentTime % 60).ToString("00")}";
-        Timer();
+        _timerText.text = $"{(_currentTime / 60).ToString("00")}:{(_currentTime % 60).ToString("00")}";        
     }
 
     private void Update()
     {
-        if (_timerRunning && _currentTime > 0)
+        if (_timerRunning && _currentTime > 0f)
         {
             _currentTime -= Time.deltaTime;
             _timerText.text = $"{Mathf.Floor(_currentTime / 60):00}:{Mathf.Floor(_currentTime % 60):00}";
         }
-        else if (_currentTime <= 0)
-            _sceneManagement.OnSceneIndexLoad("MapScene");
+        else if (_currentTime <= 0f)
+        {
+            _currentTime = 0f;
+            GameData.SetNextDay();
+            OnTimeGone?.Invoke("MapScene");
+        }
     }
 
     private void Timer()
