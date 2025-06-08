@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 public static class GameData
@@ -29,6 +30,8 @@ public static class GameData
     #endregion
 
     #region NotebookFill
+    public static Action OnAddNote;
+
     public static Dictionary<int, List<string>> notebook;
     public static int notesCounter;
 
@@ -44,25 +47,23 @@ public static class GameData
 
     public static void AddNote(string name, string place, string events, string date)
     {
-        List<string> note = new List<string>();
+        if (notebook.Count != 0)
+        {
+            foreach (List<string> note in notebook.Values)
+            {
+                if (note.Contains(name) && note.Contains(place) && note.Contains(date))
+                    return;
+            }
+        }
 
-        note.Add(name);
-        note.Add(place);
-        note.Add(events);
-        note.Add(date);
+        List<string> newNote = new List<string> {name, place, events, date};        
 
-        notebook.Add(notesCounter, note);
+        notebook.Add(notesCounter, newNote);
+
+        OnAddNote?.Invoke();
+
         notesCounter++;        
     }
 
-    #endregion
-
-    #region MapButtons
-    public static List<int> mapButtons;
-
-    public static void AddButtonToInactive(int buttonIndex)
-    {
-        mapButtons.Add(buttonIndex);
-    }
-    #endregion
+    #endregion   
 }
